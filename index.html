@@ -148,8 +148,10 @@
     position:relative;
     overflow:hidden;
     background-image:
-      repeating-linear-gradient(var(--paper) 0 37px, var(--paper-line) 37px 38px);
-    background-position: 0 12px;
+      repeating-linear-gradient(
+          var(--paper) 0 40px,
+          rgba(34,48,31,.035) 40px 41px
+      );
   }
   .book::before{
     content:'';
@@ -694,7 +696,8 @@ link('si_p_r','si_p','si_p_val', v=>fmt(v));
 link('si_r',null,'si_r_val', v=>v.toFixed(1)+'%');
 link('si_t',null,'si_t_val', v=>v+' '+unit('unit_year',v));
 
-function calcSimple(){
+// https://conamsweb.hashnode.dev/using-functions-in-javascript-to-build-a-simple-interest-step-by-step-process
+function calcSimple(){ // ดอกเบี้ยแบบธรรมดา า า า าาาา เก
   const P = parseFloat(document.getElementById('si_p').value)||0;
   const R = parseFloat(document.getElementById('si_r').value)||0;
   const T = parseFloat(document.getElementById('si_t').value)||0;
@@ -707,7 +710,7 @@ function calcSimple(){
   document.getElementById('si_caption').textContent = currentLang==='th'
     ? `${s}${fmt(P)} ดอกเบี้ยแบบธรรมดา ${R}% ต่อปี เป็นเวลา ${T} ปี`
     : `${s}${fmt(P)} at ${R}% simple interest over ${T} year${T==1?'':'s'}`;
-  drawBarSplit('si_chart', P, I, s);
+  drawBarSplit('si_chart', P, I, s); // วาดบักเหลียมๆ 2 ก้อน (โปรดใช้งานได้สาธุ 99)
 }
 
 link('ci_p_r','ci_p','ci_p_val', v=>fmt(v));
@@ -730,7 +733,8 @@ function freqNameEn(n){
   return n==1?'annually':n==2?'semi-annually':n==4?'quarterly':n==12?'monthly':'daily';
 }
 
-function calcCompound(){
+// https://www.geeksforgeeks.org/javascript/javascript-program-to-find-compound-interest/
+function calcCompound(){ // ดอกเบี้ยทบต้น
   const P = parseFloat(document.getElementById('ci_p').value)||0;
   const R = parseFloat(document.getElementById('ci_r').value)||0;
   const T = parseFloat(document.getElementById('ci_t').value)||0;
@@ -759,10 +763,11 @@ link('ln_p_r','ln_p','ln_p_val', v=>fmt(v));
 link('ln_r',null,'ln_r_val', v=>v.toFixed(2)+'%');
 link('ln_t',null,'ln_t_val', v=>v+' '+unit('unit_year',v));
 
-function calcLoan(){
-  const P = parseFloat(document.getElementById('ln_p').value)||0;
-  const R = parseFloat(document.getElementById('ln_r').value)||0;
-  const T = parseFloat(document.getElementById('ln_t').value)||1;
+// https://medium.com/@cwrworksite/loan-calculator-using-html-css-and-javascript-with-source-code-2ef06de5b78d
+function calcLoan(){ // เงินกู้ / ค่างวด กังๆ
+  const P = parseFloat(document.getElementById('ln_p').value)||0; // เงินต้นไพะน่ำพตีะำไพแะ
+  const R = parseFloat(document.getElementById('ln_r').value)||0; // อัตราดอกเบี้ย
+  const T = parseFloat(document.getElementById('ln_t').value)||1; // ระยะเวลา
   const s = sym('ln_curr');
   const n = Math.round(T*12);
   const r = (R/100)/12;
@@ -804,7 +809,8 @@ link('rd_p_r','rd_p','rd_p_val', v=>fmt(v));
 link('rd_r',null,'rd_r_val', v=>v.toFixed(1)+'%');
 link('rd_t',null,'rd_t_val', v=>v+' '+unit('unit_month',v));
 
-function calcRD(){
+// https://stackoverflow.com/questions/37039071/need-a-formula-to-calculate-annually-compounded-recurring-deposits
+function calcRD(){ // เงินฝากประจำ
   const P = parseFloat(document.getElementById('rd_p').value)||0;
   const R = parseFloat(document.getElementById('rd_r').value)||0;
   const n = parseFloat(document.getElementById('rd_t').value)||1;
@@ -837,7 +843,8 @@ link('gl_r',null,'gl_r_val', v=>v.toFixed(1)+'%');
 link('gl_t',null,'gl_t_val', v=>v+' '+unit('unit_year',v));
 link('gl_s',null,'gl_s_val', v=>fmt(v));
 
-function calcGoal(){
+// https://www.sourcecodester.com/javascript/17189/savings-goal-calculator-using-html-css-and-javascript-source-code.html
+function calcGoal(){ // เป้าหมายเงินออม
   const target = parseFloat(document.getElementById('gl_p').value)||0;
   const R = parseFloat(document.getElementById('gl_r').value)||0;
   const T = parseFloat(document.getElementById('gl_t').value)||1;
