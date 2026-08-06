@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ledger — Interest Calculator">
+<meta property="og:description" content="Calculate Simple Interest, Compound Interest, Loan EMI, Recurring Deposits, and Savings Goals. Supports English and Thai. Everything runs locally in your browser.">
+<meta property="og:url" content="https://yourdomain.com/">
+<meta property="og:image" content="https://yourdomain.com/assets/ledger-preview.png">
+<meta property="og:site_name" content="Ledger">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ledger — Interest Calculator">
+<meta name="twitter:description" content="A clean, bilingual interest calculator for simple interest, compound interest, loans, recurring deposits, and savings goals.">
+<meta name="twitter:image" content="https://yourdomain.com/assets/ledger-preview.png">
+<meta name="theme-color" content="#16241C">
+<title>Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Noto+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cover:#16241C;
+    --cover-2:#1E3327;
+    --cover-line: rgba(237,230,211,0.08);
+    --paper:#EDE6D3;
+    --paper-2:#E4DAC0;
+    --paper-line:#D3C7A5;
+    --ink:#22301F ;
+    --ink-soft:#6b7a63;
+    --brass:#C08A2E;
+    --brass-dark:#8f6520;
+    --brass-light:#E3B45C;
+    --sage:#4E6B53;
+    --rust:#A24936;
+    --cream:#EDE6D3;
+    --shadow: 0 24px 60px -20px rgba(0,0,0,0.55);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, var(--cover-2), transparent 60%),
+      var(--cover);
+    color:var(--cream);
+    font-family:'Inter','Noto Sans Thai',sans-serif;
+    min-height:100vh;
+    padding:0 0 80px 0;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+
+  header{padding:64px 24px 40px;position:relative;}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-top:25px;margin-bottom:28px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--brass-light);
+    display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .eyebrow::before{content:'';width:22px;height:1px;background:var(--brass-light);display:inline-block;}
+
+  .langswitch{
+    display:inline-flex;
+    background:rgba(237,230,211,0.06);
+    border:1px solid var(--cover-line);
+    border-radius:20px;
+    padding:3px;
+    flex:0 0 auto;
+  }
+  .langbtn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:.04em;
+    padding:8px 16px;
+    border-radius:16px;
+    border:none;background:transparent;
+    color:rgba(237,230,211,0.55);
+    cursor:pointer;
+    transition:all .18s ease;
+  }
+  .langbtn.active{background:var(--brass);color:var(--cover);font-weight:600;}
+  .langbtn:hover:not(.active){color:var(--cream);}
+
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(38px,6vw,64px);
+    line-height:1.08;
+    margin:18px 0 18px;
+    letter-spacing:-0.01em;
+    max-width:16ch;
+  }
+  html[lang="th"] h1{font-family:'Noto Sans Thai','Fraunces',serif; font-weight:700;}
+  h1 em{font-style:italic;font-weight:500;color:var(--brass-light);}
+  html[lang="th"] h1 em{font-style:normal;font-weight:700;}
+  .sub{
+    font-size:17px;
+    line-height:1.7;
+    color:rgba(237,230,211,0.72);
+    max-width:52ch;
+    margin:0;
+  }
+
+  .tabbar-wrap{position:relative;}
+  .tabbar{
+    display:flex;gap:6px;
+    padding:0 24px;
+    max-width:1120px;margin:44px auto 0;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar{display:none;}
+  @media(max-width:680px){
+    .tabbar-wrap::after{
+      content:'';position:absolute;top:0;right:0;bottom:0;width:36px;
+      background:linear-gradient(to right, transparent, var(--cover));
+      pointer-events:none;
+    }
+  }
+  .tab{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    white-space:nowrap;
+    color:rgba(237,230,211,0.55);
+    background:rgba(237,230,211,0.05);
+    border:1px solid var(--cover-line);
+    border-bottom:none;
+    padding:13px 18px 15px;
+    border-radius:10px 10px 0 0;
+    cursor:pointer;
+    transition:all .18s ease;
+    position:relative;
+    top:1px;
+  }
+  html[lang="th"] .tab{font-family:'Noto Sans Thai',sans-serif;font-size:13.5px;}
+  .tab:hover{color:var(--cream);background:rgba(237,230,211,0.09);}
+  .tab.active{
+    color:var(--ink);
+    background:var(--paper);
+    border-color:var(--paper);
+  }
+
+  .book{
+    background:var(--paper);
+    border-radius:4px 14px 14px 14px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+    background-image:
+      repeating-linear-gradient(var(--paper) 0 37px, var(--paper-line) 37px 38px);
+    background-position: 0 12px;
+  }
+  .book::before{
+    content:'';
+    position:absolute;left:50%;top:0;bottom:0;width:1px;
+    background:repeating-linear-gradient(to bottom, var(--brass) 0 3px, transparent 3px 9px);
+    opacity:.35;
+    display:block;
+  }
+  .book-inner{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    min-height:520px;
+  }
+  @media(max-width:820px){
+    .book-inner{grid-template-columns:1fr;}
+    .book::before{display:none;}
+  }
+
+  .pane{padding:44px 40px;}
+  .pane-right{
+    background:rgba(34,48,31,0.035);
+  }
+  .field-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-soft);
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:8px;
+    gap:10px;
+  }
+  html[lang="th"] .field-label{font-family:'Noto Sans Thai',sans-serif;font-size:12.5px;letter-spacing:0;text-transform:none;}
+  .field-label .lbl{white-space:nowrap;}
+  .field-label .val{color:var(--brass-dark);font-weight:600;white-space:nowrap;font-family:'IBM Plex Mono',monospace;}
+  .field{margin-bottom:26px;}
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:2px;background:var(--paper-line);
+    border-radius:2px;outline:none;margin:10px 0 4px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--brass);border:2px solid var(--paper);
+    box-shadow:0 0 0 1px var(--brass-dark);cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--brass);
+    border:2px solid var(--paper);box-shadow:0 0 0 1px var(--brass-dark);cursor:pointer;
+  }
+  .numrow{display:flex;align-items:center;gap:10px;}
+  input[type=number], input[type=text], select{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:20px;font-weight:600;
+    color:var(--ink);
+    background:transparent;
+    border:none;border-bottom:1.5px solid var(--paper-line);
+    padding:4px 2px 8px;
+    width:100%;
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  input[type=number]:focus, input[type=text]:focus, select:focus{border-color:var(--brass);}
+  select{cursor:pointer;font-size:15px;padding:6px 2px 8px;}
+  .curr-select{width:90px;flex:0 0 auto;}
+
+  .segbtns{display:flex;gap:8px;flex-wrap:wrap;}
+  .segbtn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    padding:9px 14px;
+    border-radius:20px;
+    border:1px solid var(--paper-line);
+    background:transparent;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  html[lang="th"] .segbtn{font-family:'Noto Sans Thai',sans-serif;}
+  .segbtn:hover{border-color:var(--brass);color:var(--ink);}
+  .segbtn.active{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+
+  .resultlabel{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--brass-dark);margin-bottom:6px;
+  }
+  html[lang="th"] .resultlabel{font-family:'Noto Sans Thai',sans-serif;font-size:13px;letter-spacing:0;text-transform:none;font-weight:600;}
+  .bigtotal{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(38px,4.4vw,54px);
+    color:var(--ink);
+    line-height:1;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .totalcaption{font-size:13px;color:var(--ink-soft);margin-bottom:30px;line-height:1.5;}
+  html[lang="th"] .totalcaption{font-family:'Noto Sans Thai',sans-serif;}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 24px;margin-bottom:30px;}
+  .stat{border-top:1px solid var(--paper-line);padding-top:10px;}
+  .stat .k{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px;}
+  html[lang="th"] .stat .k{font-family:'Noto Sans Thai',sans-serif;font-size:12px;letter-spacing:0;text-transform:none;}
+  .stat .v{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:var(--ink);font-variant-numeric: tabular-nums;}
+  .stat .v.rust{color:var(--rust);}
+  .stat .v.sage{color:var(--sage);}
+
+  svg.chart{width:100%;height:auto;display:block;margin-top:6px;}
+
+  table.amort{
+    width:100%;border-collapse:collapse;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    margin-top:6px;
+  }
+  table.amort th{
+    text-align:right;font-weight:600;color:var(--ink-soft);
+    text-transform:uppercase;font-size:10px;letter-spacing:.06em;
+    padding:6px 4px;border-bottom:1px solid var(--ink);
+  }
+  html[lang="th"] table.amort th{font-family:'Noto Sans Thai',sans-serif;text-transform:none;font-size:11px;}
+  table.amort th:first-child, table.amort td:first-child{text-align:left;}
+  table.amort td{text-align:right;padding:6px 4px;color:var(--ink);border-bottom:1px solid var(--paper-line);}
+  .tablewrap{max-height:220px;overflow-y:auto;border-radius:4px;}
+  .tablewrap::-webkit-scrollbar{width:6px;}
+  .tablewrap::-webkit-scrollbar-thumb{background:var(--paper-line);border-radius:4px;}
+
+  .legend{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+  html[lang="th"] .legend-item{font-family:'Noto Sans Thai',sans-serif;}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+  footer{
+    max-width:1120px;margin:56px auto 0;padding:24px 24px 0;
+    border-top:1px solid var(--cover-line);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    color:rgba(237,230,211,0.45);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+  html[lang="th"] footer{font-family:'Noto Sans Thai',sans-serif;}
+
+  @media(max-width:680px){
+    .wrap{padding:0 18px;}
+    header{padding:36px 18px 28px;}
+    .header-top{margin-top:14px;margin-bottom:22px;}
+    h1{font-size:clamp(30px,8vw,42px);max-width:100%;margin:14px 0 14px;}
+    .sub{font-size:15px;line-height:1.6;}
+    .tabbar{padding:0 18px;margin-top:30px;}
+    .tab{padding:11px 14px 13px;font-size:11.5px;}
+    html[lang="th"] .tab{font-size:12.5px;}
+    .book{border-radius:4px 10px 10px 10px;}
+    .book-inner{min-height:0;}
+    .pane{padding:30px 20px;}
+    .bigtotal{font-size:clamp(32px,10vw,44px);}
+    .stat-grid{grid-template-columns:1fr;gap:14px;}
+    .curr-select{width:76px;}
+    input[type=number]{font-size:18px;}
+    .langbtn{padding:7px 13px;font-size:11px;}
+    footer{flex-direction:column;gap:6px;padding:20px 18px 0;}
+  }
+
+  @media(max-width:380px){
+    .curr-select{width:66px;}
+    .numrow{gap:8px;}
+  }
+
+  [hidden]{display:none !important;}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="header-top">
+    <div class="eyebrow" data-i18n="eyebrow">เครื่องคำนวณดอกเบี้ย</div>
+    <div class="langswitch">
+      <button class="langbtn active" data-lang="th">ไทย</button>
+      <button class="langbtn" data-lang="en">English</button>
+    </div>
+  </div>
+  <h1 data-i18n-html="h1">ทุกบาท ทุกดอลลาร์<br><em>คำนวณได้ครบถ้วน</em></h1>
+  <p class="sub" data-i18n="sub">ห้าวิธีคำนวณดอกเบี้ย — แบบธรรมดา แบบทบต้น เงินกู้ เงินฝากประจำ และเป้าหมายเงินออม คำนวณทั้งหมดในเบราว์เซอร์ของคุณ ไม่มีการเก็บหรือส่งข้อมูลไปที่ใด</p>
+</header>
+
+<div class="tabbar-wrap">
+<div class="tabbar" id="tabbar">
+  <button class="tab active" data-tab="simple" data-i18n="tab_simple">01 · ดอกเบี้ยแบบธรรมดา</button>
+  <button class="tab" data-tab="compound" data-i18n="tab_compound">02 · ดอกเบี้ยทบต้น</button>
+  <button class="tab" data-tab="loan" data-i18n="tab_loan">03 · เงินกู้ / ค่างวด</button>
+  <button class="tab" data-tab="rd" data-i18n="tab_rd">04 · เงินฝากประจำ</button>
+  <button class="tab" data-tab="goal" data-i18n="tab_goal">05 · เป้าหมายเงินออม</button>
+</div>
+</div>
+
+<div class="wrap">
+<div class="book">
+<div class="book-inner">
+
+  <div class="pane pane-left" data-panel="simple">
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="si_p_label">เงินต้น</span><span class="val" id="si_p_val">10,000</span></div>
+      <div class="numrow">
+        <select class="curr-select" id="si_curr"></select>
+        <input type="number" id="si_p" value="10000" min="0" step="100">
+      </div>
+      <input type="range" id="si_p_r" min="0" max="200000" step="100" value="10000">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="rate_label">อัตราดอกเบี้ยต่อปี</span><span class="val" id="si_r_val">6.0%</span></div>
+      <input type="range" id="si_r" min="0" max="30" step="0.1" value="6">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="time_label">ระยะเวลา</span><span class="val" id="si_t_val">3 ปี</span></div>
+      <input type="range" id="si_t" min="0" max="30" step="1" value="3">
+    </div>
+  </div>
+  <div class="pane pane-right" data-panel="simple">
+    <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+    <div class="bigtotal" id="si_total">0</div>
+    <div class="totalcaption" id="si_caption"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="k" data-i18n="interest_earned_label">ดอกเบี้ยที่ได้รับ</div><div class="v sage" id="si_interest">0</div></div>
+      <div class="stat"><div class="k" data-i18n="principal_label">เงินต้น</div><div class="v" id="si_principal_out">0</div></div>
+    </div>
+    <svg class="chart" id="si_chart" viewBox="0 0 460 140"></svg>
+  </div>
+
+  <div class="pane pane-left" data-panel="compound" hidden>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="ci_p_label">เงินต้น</span><span class="val" id="ci_p_val">10,000</span></div>
+      <div class="numrow">
+        <select class="curr-select" id="ci_curr"></select>
+        <input type="number" id="ci_p" value="10000" min="0" step="100">
+      </div>
+      <input type="range" id="ci_p_r" min="0" max="200000" step="100" value="10000">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="rate_label">อัตราดอกเบี้ยต่อปี</span><span class="val" id="ci_r_val">6.0%</span></div>
+      <input type="range" id="ci_r" min="0" max="30" step="0.1" value="6">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="time_label">ระยะเวลา</span><span class="val" id="ci_t_val">10 ปี</span></div>
+      <input type="range" id="ci_t" min="0" max="40" step="1" value="10">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="freq_label">ความถี่ในการทบต้น</span></div>
+      <div class="segbtns" id="ci_freq">
+        <button class="segbtn" data-v="1" data-i18n="freq_annual">รายปี</button>
+        <button class="segbtn" data-v="2" data-i18n="freq_semi">ทุกครึ่งปี</button>
+        <button class="segbtn" data-v="4" data-i18n="freq_quarter">รายไตรมาส</button>
+        <button class="segbtn active" data-v="12" data-i18n="freq_month">รายเดือน</button>
+        <button class="segbtn" data-v="365" data-i18n="freq_day">รายวัน</button>
+      </div>
+    </div>
+  </div>
+  <div class="pane pane-right" data-panel="compound" hidden>
+    <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+    <div class="bigtotal" id="ci_total">0</div>
+    <div class="totalcaption" id="ci_caption"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="k" data-i18n="interest_earned_label">ดอกเบี้ยที่ได้รับ</div><div class="v sage" id="ci_interest">0</div></div>
+      <div class="stat"><div class="k" data-i18n="ear_label">อัตราดอกเบี้ยที่แท้จริงต่อปี</div><div class="v" id="ci_ear">0</div></div>
+    </div>
+    <svg class="chart" id="ci_chart" viewBox="0 0 460 150"></svg>
+    <div class="legend">
+      <span class="legend-item"><span class="dot" style="background:var(--ink)"></span><span data-i18n="legend_principal">เงินต้น</span></span>
+      <span class="legend-item"><span class="dot" style="background:var(--brass)"></span><span data-i18n="legend_interest">ดอกเบี้ย</span></span>
+    </div>
+  </div>
+
+  <div class="pane pane-left" data-panel="loan" hidden>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="ln_p_label">จำนวนเงินกู้</span><span class="val" id="ln_p_val">200,000</span></div>
+      <div class="numrow">
+        <select class="curr-select" id="ln_curr"></select>
+        <input type="number" id="ln_p" value="200000" min="0" step="1000">
+      </div>
+      <input type="range" id="ln_p_r" min="0" max="2000000" step="1000" value="200000">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="rate_label">อัตราดอกเบี้ยต่อปี</span><span class="val" id="ln_r_val">7.5%</span></div>
+      <input type="range" id="ln_r" min="0" max="25" step="0.05" value="7.5">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="ln_t_label">ระยะเวลากู้</span><span class="val" id="ln_t_val">15 ปี</span></div>
+      <input type="range" id="ln_t" min="1" max="30" step="1" value="15">
+    </div>
+  </div>
+  <div class="pane pane-right" data-panel="loan" hidden>
+    <div class="resultlabel" data-i18n="emi_label">ค่างวดรายเดือน (EMI)</div>
+    <div class="bigtotal" id="ln_emi">0</div>
+    <div class="totalcaption" id="ln_caption"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="k" data-i18n="total_interest_label">ดอกเบี้ยรวม</div><div class="v rust" id="ln_interest">0</div></div>
+      <div class="stat"><div class="k" data-i18n="total_repay_label">ยอดชำระรวม</div><div class="v" id="ln_total">0</div></div>
+    </div>
+    <svg class="chart" id="ln_donut" viewBox="0 0 460 150"></svg>
+    <div class="legend" style="margin-bottom:14px;">
+      <span class="legend-item"><span class="dot" style="background:var(--ink)"></span><span data-i18n="legend_principal">เงินต้น</span></span>
+      <span class="legend-item"><span class="dot" style="background:var(--rust)"></span><span data-i18n="legend_interest">ดอกเบี้ย</span></span>
+    </div>
+    <div class="resultlabel" data-i18n="amort_label">ตารางผ่อนชำระ — รายปี</div>
+    <div class="tablewrap">
+      <table class="amort" id="ln_table"></table>
+    </div>
+  </div>
+
+  <div class="pane pane-left" data-panel="rd" hidden>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="rd_p_label">เงินฝากรายเดือน</span><span class="val" id="rd_p_val">200</span></div>
+      <div class="numrow">
+        <select class="curr-select" id="rd_curr"></select>
+        <input type="number" id="rd_p" value="200" min="0" step="10">
+      </div>
+      <input type="range" id="rd_p_r" min="0" max="5000" step="10" value="200">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="rate_label">อัตราดอกเบี้ยต่อปี</span><span class="val" id="rd_r_val">6.0%</span></div>
+      <input type="range" id="rd_r" min="0" max="20" step="0.1" value="6">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="rd_t_label">ระยะเวลา</span><span class="val" id="rd_t_val">36 เดือน</span></div>
+      <input type="range" id="rd_t" min="1" max="240" step="1" value="36">
+    </div>
+  </div>
+  <div class="pane pane-right" data-panel="rd" hidden>
+    <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+    <div class="bigtotal" id="rd_total">0</div>
+    <div class="totalcaption" id="rd_caption"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="k" data-i18n="total_deposited_label">เงินฝากรวม</div><div class="v" id="rd_deposited">0</div></div>
+      <div class="stat"><div class="k" data-i18n="interest_earned_label">ดอกเบี้ยที่ได้รับ</div><div class="v sage" id="rd_interest">0</div></div>
+    </div>
+    <svg class="chart" id="rd_chart" viewBox="0 0 460 150"></svg>
+    <div class="legend">
+      <span class="legend-item"><span class="dot" style="background:var(--ink)"></span><span data-i18n="legend_deposited">เงินที่ฝาก</span></span>
+      <span class="legend-item"><span class="dot" style="background:var(--brass)"></span><span data-i18n="legend_interest">ดอกเบี้ย</span></span>
+    </div>
+  </div>
+
+  <div class="pane pane-left" data-panel="goal" hidden>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="gl_p_label">จำนวนเงินเป้าหมาย</span><span class="val" id="gl_p_val">20,000</span></div>
+      <div class="numrow">
+        <select class="curr-select" id="gl_curr"></select>
+        <input type="number" id="gl_p" value="20000" min="0" step="100">
+      </div>
+      <input type="range" id="gl_p_r" min="0" max="500000" step="100" value="20000">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="rate_label">อัตราดอกเบี้ยต่อปี</span><span class="val" id="gl_r_val">5.0%</span></div>
+      <input type="range" id="gl_r" min="0" max="20" step="0.1" value="5">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="gl_t_label">ระยะเวลาถึงเป้าหมาย</span><span class="val" id="gl_t_val">5 ปี</span></div>
+      <input type="range" id="gl_t" min="1" max="30" step="1" value="5">
+    </div>
+    <div class="field">
+      <div class="field-label"><span class="lbl" data-i18n="gl_s_label">ยอดเงินเริ่มต้นวันนี้</span><span class="val" id="gl_s_val">0</span></div>
+      <input type="range" id="gl_s" min="0" max="200000" step="100" value="0">
+    </div>
+  </div>
+  <div class="pane pane-right" data-panel="goal" hidden>
+    <div class="resultlabel" data-i18n="req_monthly_label">จำนวนที่ต้องออมต่อเดือน</div>
+    <div class="bigtotal" id="gl_monthly">0</div>
+    <div class="totalcaption" id="gl_caption"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="k" data-i18n="lumpsum_label">หรือ เป็นเงินก้อนวันนี้</div><div class="v" id="gl_lumpsum">0</div></div>
+      <div class="stat"><div class="k" data-i18n="interest_does_work_label">ดอกเบี้ยที่ช่วยให้ถึงเป้าหมาย</div><div class="v sage" id="gl_interest">0</div></div>
+    </div>
+    <svg class="chart" id="gl_chart" viewBox="0 0 460 140"></svg>
+  </div>
+
+</div>
+</div>
+</div>
+
+<footer class="wrap">
+  <span data-i18n="footer_left">Ledger — เครื่องคำนวณดอกเบี้ยที่เข้าใจง่าย</span>
+  <span data-i18n="footer_right">ตัวเลขทั้งหมดเป็นค่าประมาณ และคำนวณในเบราว์เซอร์ของคุณ</span>
+</footer>
+
+<script>
+const I18N = {
+  eyebrow:{th:'เครื่องคำนวณดอกเบี้ย', en:'Interest Calculator'},
+  h1:{
+    th:'ทุกบาท ทุกดอลลาร์<br><em>คำนวณได้ครบถ้วน</em>',
+    en:'Every rupee, dollar<br>or baht, <em>accounted for.</em>'
+  },
+  sub:{
+    th:'ห้าวิธีคำนวณดอกเบี้ย — แบบธรรมดา แบบทบต้น เงินกู้ เงินฝากประจำ และเป้าหมายเงินออม คำนวณทั้งหมดในเบราว์เซอร์ของคุณ ไม่มีการเก็บหรือส่งข้อมูลไปที่ใด',
+    en:'Five ways to work out interest — simple, compound, loans, recurring deposits and savings goals. Everything runs in your browser, nothing is stored or sent anywhere.'
+  },
+  tab_simple:{th:'01 · ดอกเบี้ยแบบธรรมดา', en:'01 · Simple Interest'},
+  tab_compound:{th:'02 · ดอกเบี้ยทบต้น', en:'02 · Compound Interest'},
+  tab_loan:{th:'03 · เงินกู้ / ค่างวด', en:'03 · Loan / EMI'},
+  tab_rd:{th:'04 · เงินฝากประจำ', en:'04 · Recurring Deposit'},
+  tab_goal:{th:'05 · เป้าหมายเงินออม', en:'05 · Savings Goal'},
+
+  si_p_label:{th:'เงินต้น', en:'Principal'},
+  ci_p_label:{th:'เงินต้น', en:'Principal'},
+  ln_p_label:{th:'จำนวนเงินกู้', en:'Loan amount'},
+  rd_p_label:{th:'เงินฝากรายเดือน', en:'Monthly deposit'},
+  gl_p_label:{th:'จำนวนเงินเป้าหมาย', en:'Target amount'},
+  rate_label:{th:'อัตราดอกเบี้ยต่อปี', en:'Annual rate'},
+  time_label:{th:'ระยะเวลา', en:'Time period'},
+  ln_t_label:{th:'ระยะเวลากู้', en:'Loan tenure'},
+  rd_t_label:{th:'ระยะเวลา', en:'Tenure'},
+  gl_t_label:{th:'ระยะเวลาถึงเป้าหมาย', en:'Time to goal'},
+  gl_s_label:{th:'ยอดเงินเริ่มต้นวันนี้', en:'Starting balance today'},
+  freq_label:{th:'ความถี่ในการทบต้น', en:'Compounding frequency'},
+  freq_annual:{th:'รายปี', en:'Annually'},
+  freq_semi:{th:'ทุกครึ่งปี', en:'Semi-annually'},
+  freq_quarter:{th:'รายไตรมาส', en:'Quarterly'},
+  freq_month:{th:'รายเดือน', en:'Monthly'},
+  freq_day:{th:'รายวัน', en:'Daily'},
+
+  maturity_label:{th:'มูลค่าเมื่อครบกำหนด', en:'Maturity value'},
+  interest_earned_label:{th:'ดอกเบี้ยที่ได้รับ', en:'Interest earned'},
+  principal_label:{th:'เงินต้น', en:'Principal'},
+  ear_label:{th:'อัตราดอกเบี้ยที่แท้จริงต่อปี', en:'Effective annual rate'},
+  legend_principal:{th:'เงินต้น', en:'Principal'},
+  legend_interest:{th:'ดอกเบี้ย', en:'Interest'},
+  legend_deposited:{th:'เงินที่ฝาก', en:'Deposited'},
+
+  emi_label:{th:'ค่างวดรายเดือน (EMI)', en:'Monthly payment (EMI)'},
+  total_interest_label:{th:'ดอกเบี้ยรวม', en:'Total interest'},
+  total_repay_label:{th:'ยอดชำระรวม', en:'Total repayment'},
+  amort_label:{th:'ตารางผ่อนชำระ — รายปี', en:'Amortization — yearly'},
+  th_year:{th:'ปี', en:'Year'},
+  th_principal:{th:'เงินต้น', en:'Principal'},
+  th_interest:{th:'ดอกเบี้ย', en:'Interest'},
+  th_balance:{th:'ยอดคงเหลือ', en:'Balance'},
+
+  total_deposited_label:{th:'เงินฝากรวม', en:'Total deposited'},
+
+  req_monthly_label:{th:'จำนวนที่ต้องออมต่อเดือน', en:'Required monthly saving'},
+  lumpsum_label:{th:'หรือ เป็นเงินก้อนวันนี้', en:'Or, as a lump sum today'},
+  interest_does_work_label:{th:'ดอกเบี้ยที่ช่วยให้ถึงเป้าหมาย', en:'Interest that does the work'},
+
+  footer_left:{th:'Ledger — เครื่องคำนวณดอกเบี้ยที่เข้าใจง่าย', en:'Ledger — a plain-language interest calculator'},
+  footer_right:{th:'ตัวเลขทั้งหมดเป็นค่าประมาณ และคำนวณในเบราว์เซอร์ของคุณ', en:'All figures are estimates and run locally in your browser.'},
+
+  unit_year:{th:'ปี', en_one:'year', en_other:'years'},
+  unit_month:{th:'เดือน', en_one:'month', en_other:'months'}
+};
+
+let currentLang = 'th';
+
+function t(key){ return I18N[key] ? I18N[key][currentLang] : key; }
+
+function unit(key, n){
+  if(currentLang==='th') return I18N[key].th;
+  return n===1 ? I18N[key].en_one : I18N[key].en_other;
+}
+
+function applyLanguage(){
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(I18N[k]) el.textContent = I18N[k][currentLang];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    const k = el.getAttribute('data-i18n-html');
+    if(I18N[k]) el.innerHTML = I18N[k][currentLang];
+  });
+  document.querySelectorAll('.langbtn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.lang===currentLang);
+  });
+  refreshSliderLabels();
+  calcAll();
+}
+
+document.querySelectorAll('.langbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(btn.dataset.lang===currentLang) return;
+    currentLang = btn.dataset.lang;
+    applyLanguage();
+  });
+});
+
+const CURRENCIES = [
+  {c:'USD',s:'$'},{c:'EUR',s:'€'},{c:'GBP',s:'£'},{c:'THB',s:'฿'},
+  {c:'INR',s:'₹'},{c:'JPY',s:'¥'},{c:'AUD',s:'A$'},{c:'SGD',s:'S$'}
+];
+function fillCurrencySelect(sel, def){
+  sel.innerHTML = CURRENCIES.map(x=>`<option value="${x.s}" ${x.c===def?'selected':''}>${x.c}</option>`).join('');
+}
+['si_curr','ci_curr','ln_curr','rd_curr','gl_curr'].forEach(id=>fillCurrencySelect(document.getElementById(id),'USD'));
+
+function fmt(n){
+  if(!isFinite(n)) n=0;
+  return n.toLocaleString(undefined,{maximumFractionDigits:0});
+}
+function sym(id){ return document.getElementById(id).value; }
+
+const animState = {};
+function animateTo(el, target, prefix){
+  const key = el.id;
+  const start = animState[key] !== undefined ? animState[key] : 0;
+  const duration = 450;
+  const t0 = performance.now();
+  cancelAnimationFrame(el._raf);
+  function step(t){
+    const p = Math.min(1,(t-t0)/duration);
+    const eased = 1-Math.pow(1-p,3);
+    const val = start + (target-start)*eased;
+    el.textContent = prefix + fmt(val);
+    if(p<1){ el._raf = requestAnimationFrame(step); }
+    else { animState[key]=target; }
+  }
+  el._raf = requestAnimationFrame(step);
+}
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const name = tab.dataset.tab;
+    document.querySelectorAll('[data-panel]').forEach(p=>{
+      p.hidden = p.dataset.panel !== name;
+    });
+  });
+});
+
+const sliderLabelFns = {};
+function link(rangeId, numId, labelId, formatter){
+  const r = document.getElementById(rangeId);
+  const n = numId ? document.getElementById(numId) : null;
+  const l = document.getElementById(labelId);
+  sliderLabelFns[labelId] = ()=>{ if(l) l.textContent = formatter(parseFloat(r.value)); };
+  function update(fromRange){
+    if(fromRange && n) n.value = r.value;
+    if(!fromRange && n) r.value = n.value;
+    sliderLabelFns[labelId]();
+  }
+  r.addEventListener('input',()=>{update(true); calcAll();});
+  if(n) n.addEventListener('input',()=>{update(false); calcAll();});
+  return r;
+}
+function refreshSliderLabels(){
+  Object.values(sliderLabelFns).forEach(fn=>fn());
+}
+
+link('si_p_r','si_p','si_p_val', v=>fmt(v));
+link('si_r',null,'si_r_val', v=>v.toFixed(1)+'%');
+link('si_t',null,'si_t_val', v=>v+' '+unit('unit_year',v));
+
+function calcSimple(){
+  const P = parseFloat(document.getElementById('si_p').value)||0;
+  const R = parseFloat(document.getElementById('si_r').value)||0;
+  const T = parseFloat(document.getElementById('si_t').value)||0;
+  const I = P*R*T/100;
+  const total = P+I;
+  const s = sym('si_curr');
+  animateTo(document.getElementById('si_total'), total, s);
+  document.getElementById('si_interest').textContent = s+fmt(I);
+  document.getElementById('si_principal_out').textContent = s+fmt(P);
+  document.getElementById('si_caption').textContent = currentLang==='th'
+    ? `${s}${fmt(P)} ดอกเบี้ยแบบธรรมดา ${R}% ต่อปี เป็นเวลา ${T} ปี`
+    : `${s}${fmt(P)} at ${R}% simple interest over ${T} year${T==1?'':'s'}`;
+  drawBarSplit('si_chart', P, I, s);
+}
+
+link('ci_p_r','ci_p','ci_p_val', v=>fmt(v));
+link('ci_r',null,'ci_r_val', v=>v.toFixed(1)+'%');
+link('ci_t',null,'ci_t_val', v=>v+' '+unit('unit_year',v));
+let ciFreq = 12;
+document.getElementById('ci_freq').addEventListener('click',e=>{
+  if(e.target.classList.contains('segbtn')){
+    document.querySelectorAll('#ci_freq .segbtn').forEach(b=>b.classList.remove('active'));
+    e.target.classList.add('active');
+    ciFreq = parseFloat(e.target.dataset.v);
+    calcAll();
+  }
+});
+
+function freqNameTh(n){
+  return n==1?'รายปี':n==2?'ทุกครึ่งปี':n==4?'รายไตรมาส':n==12?'รายเดือน':'รายวัน';
+}
+function freqNameEn(n){
+  return n==1?'annually':n==2?'semi-annually':n==4?'quarterly':n==12?'monthly':'daily';
+}
+
+function calcCompound(){
+  const P = parseFloat(document.getElementById('ci_p').value)||0;
+  const R = parseFloat(document.getElementById('ci_r').value)||0;
+  const T = parseFloat(document.getElementById('ci_t').value)||0;
+  const n = ciFreq;
+  const r = R/100;
+  const A = P*Math.pow(1+r/n, n*T);
+  const I = A-P;
+  const ear = (Math.pow(1+r/n,n)-1)*100;
+  const s = sym('ci_curr');
+  animateTo(document.getElementById('ci_total'), A, s);
+  document.getElementById('ci_interest').textContent = s+fmt(I);
+  document.getElementById('ci_ear').textContent = ear.toFixed(2)+'%';
+  document.getElementById('ci_caption').textContent = currentLang==='th'
+    ? `${s}${fmt(P)} ทบต้น${freqNameTh(n)} ที่ ${R}% เป็นเวลา ${T} ปี`
+    : `${s}${fmt(P)} at ${R}% compounded ${freqNameEn(n)}, for ${T} year${T==1?'':'s'}`;
+
+  const years = Math.max(1, Math.round(T));
+  const series = [];
+  for(let y=0;y<=years;y++){
+    series.push(P*Math.pow(1+r/n, n*y));
+  }
+  drawGrowthStack('ci_chart', series, P, s);
+}
+
+link('ln_p_r','ln_p','ln_p_val', v=>fmt(v));
+link('ln_r',null,'ln_r_val', v=>v.toFixed(2)+'%');
+link('ln_t',null,'ln_t_val', v=>v+' '+unit('unit_year',v));
+
+function calcLoan(){
+  const P = parseFloat(document.getElementById('ln_p').value)||0;
+  const R = parseFloat(document.getElementById('ln_r').value)||0;
+  const T = parseFloat(document.getElementById('ln_t').value)||1;
+  const s = sym('ln_curr');
+  const n = Math.round(T*12);
+  const r = (R/100)/12;
+  let emi;
+  if(r===0){ emi = P/n; } else { emi = P*r*Math.pow(1+r,n) / (Math.pow(1+r,n)-1); }
+  const totalPay = emi*n;
+  const totalInt = totalPay-P;
+
+  animateTo(document.getElementById('ln_emi'), emi, s);
+  document.getElementById('ln_interest').textContent = s+fmt(totalInt);
+  document.getElementById('ln_total').textContent = s+fmt(totalPay);
+  document.getElementById('ln_caption').textContent = currentLang==='th'
+    ? `เงินกู้ ${s}${fmt(P)} ที่ ${R}% เป็นเวลา ${T} ปี (ผ่อนชำระ ${n} งวด)`
+    : `${s}${fmt(P)} loan at ${R}% for ${T} year${T==1?'':'s'} (${n} monthly payments)`;
+
+  drawDonut('ln_donut', P, totalInt, s);
+
+  let bal = P;
+  const rows = [];
+  for(let y=1;y<=Math.ceil(T);y++){
+    let yearPrincipal=0, yearInterest=0;
+    for(let m=0;m<12 && bal>0.005;m++){
+      const interestPortion = r===0?0:bal*r;
+      let principalPortion = emi-interestPortion;
+      if(principalPortion>bal) principalPortion=bal;
+      bal -= principalPortion;
+      yearPrincipal += principalPortion;
+      yearInterest += interestPortion;
+    }
+    rows.push({y, yearPrincipal, yearInterest, bal:Math.max(bal,0)});
+    if(bal<=0.005) break;
+  }
+  const tbl = document.getElementById('ln_table');
+  tbl.innerHTML = `<tr><th>${t('th_year')}</th><th>${t('th_principal')}</th><th>${t('th_interest')}</th><th>${t('th_balance')}</th></tr>` +
+    rows.map(row=>`<tr><td>${row.y}</td><td>${s}${fmt(row.yearPrincipal)}</td><td>${s}${fmt(row.yearInterest)}</td><td>${s}${fmt(row.bal)}</td></tr>`).join('');
+}
+
+link('rd_p_r','rd_p','rd_p_val', v=>fmt(v));
+link('rd_r',null,'rd_r_val', v=>v.toFixed(1)+'%');
+link('rd_t',null,'rd_t_val', v=>v+' '+unit('unit_month',v));
+
+function calcRD(){
+  const P = parseFloat(document.getElementById('rd_p').value)||0;
+  const R = parseFloat(document.getElementById('rd_r').value)||0;
+  const n = parseFloat(document.getElementById('rd_t').value)||1;
+  const s = sym('rd_curr');
+  const r = (R/100)/12;
+  let fv;
+  if(r===0){ fv = P*n; } else { fv = P * ((Math.pow(1+r,n)-1)/r) * (1+r); }
+  const deposited = P*n;
+  const interest = fv-deposited;
+
+  animateTo(document.getElementById('rd_total'), fv, s);
+  document.getElementById('rd_deposited').textContent = s+fmt(deposited);
+  document.getElementById('rd_interest').textContent = s+fmt(interest);
+  document.getElementById('rd_caption').textContent = currentLang==='th'
+    ? `ฝากเดือนละ ${s}${fmt(P)} ที่ ${R}% เป็นเวลา ${n} เดือน`
+    : `${s}${fmt(P)} every month at ${R}% for ${n} months`;
+
+  const points = Math.min(12, n);
+  const series=[0];
+  for(let i=1;i<=points;i++){
+    const m = Math.round(i*n/points);
+    const val = r===0? P*m : P*((Math.pow(1+r,m)-1)/r)*(1+r);
+    series.push(val);
+  }
+  drawGrowthStack('rd_chart', series, deposited, s, true);
+}
+
+link('gl_p_r','gl_p','gl_p_val', v=>fmt(v));
+link('gl_r',null,'gl_r_val', v=>v.toFixed(1)+'%');
+link('gl_t',null,'gl_t_val', v=>v+' '+unit('unit_year',v));
+link('gl_s',null,'gl_s_val', v=>fmt(v));
+
+function calcGoal(){
+  const target = parseFloat(document.getElementById('gl_p').value)||0;
+  const R = parseFloat(document.getElementById('gl_r').value)||0;
+  const T = parseFloat(document.getElementById('gl_t').value)||1;
+  const start = parseFloat(document.getElementById('gl_s').value)||0;
+  const s = sym('gl_curr');
+  const n = Math.round(T*12);
+  const r = (R/100)/12;
+
+  const startFV = start*Math.pow(1+r, n);
+  const remaining = Math.max(0, target-startFV);
+
+  let monthly;
+  if(r===0){ monthly = remaining/n; }
+  else { monthly = remaining / (((Math.pow(1+r,n)-1)/r)*(1+r)); }
+  monthly = Math.max(0, monthly);
+
+  const lumpsum = target / Math.pow(1+r, n);
+
+  const totalContributed = start + monthly*n;
+  const interestEarned = target-totalContributed;
+
+  animateTo(document.getElementById('gl_monthly'), monthly, s);
+  document.getElementById('gl_lumpsum').textContent = s+fmt(lumpsum);
+  document.getElementById('gl_interest').textContent = s+fmt(Math.max(0,interestEarned));
+  document.getElementById('gl_caption').textContent = currentLang==='th'
+    ? `เพื่อให้ถึง ${s}${fmt(target)} ภายใน ${T} ปี ที่ ${R}% เริ่มจาก ${s}${fmt(start)}`
+    : `To reach ${s}${fmt(target)} in ${T} year${T==1?'':'s'} at ${R}%, starting from ${s}${fmt(start)}`;
+
+  drawBarSplit('gl_chart', start+(monthly*n), Math.max(0,interestEarned), s, true);
+}
+
+function drawBarSplit(id, a, b, s, isContrib){
+  const svg = document.getElementById(id);
+  const total = a+b || 1;
+  const w = 460, h = 140, barY=60, barH=34;
+  const aw = Math.max(2, (a/total)*(w-4));
+  const bw = Math.max(2, (b/total)*(w-4));
+  const aLabel = isContrib ? t('legend_deposited') : t('legend_principal');
+  const bLabel = t('legend_interest');
+  svg.innerHTML = `
+    <rect x="0" y="${barY}" width="${aw}" height="${barH}" rx="3" fill="var(--ink)"></rect>
+    <rect x="${aw+2}" y="${barY}" width="${bw}" height="${barH}" rx="3" fill="var(--brass)"></rect>
+    <text x="0" y="${barY-14}" font-family="IBM Plex Mono" font-size="11" fill="var(--ink-soft)">${aLabel} · ${s}${fmt(a)}</text>
+    <text x="${w}" y="${barY-14}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="var(--brass-dark)">${bLabel} · ${s}${fmt(b)}</text>
+  `;
+}
+
+function drawGrowthStack(id, series, principal, s, isRD){
+  const svg = document.getElementById(id);
+  const w=460, h=150, padB=22, padT=10;
+  const max = Math.max(...series, 1);
+  const n = series.length;
+  const bw = (w/n)*0.62;
+  const gap = (w/n)*0.38;
+  let bars='';
+  series.forEach((val,i)=>{
+    const x = i*(w/n) + gap/2;
+    const barH = (val/max)*(h-padB-padT);
+    const y = h-padB-barH;
+    const interestH = (Math.max(0,val-  (isRD? principal*(i/(n-1||1)) : principal))/max)*(h-padB-padT);
+    const princH = barH-interestH;
+    bars += `<rect x="${x}" y="${y+interestH}" width="${bw}" height="${Math.max(0,princH)}" fill="var(--ink)" rx="1.5"></rect>`;
+    bars += `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(0,interestH)}" fill="var(--brass)" rx="1.5"></rect>`;
+  });
+  svg.innerHTML = bars + `<line x1="0" y1="${h-padB}" x2="${w}" y2="${h-padB}" stroke="var(--paper-line)" stroke-width="1"></line>`;
+}
+
+function drawDonut(id, principal, interest, s){
+  const svg = document.getElementById(id);
+  const total = principal+interest || 1;
+  const cx=75, cy=75, r=58, sw=22;
+  const circumference = 2*Math.PI*r;
+  const pOff = (principal/total)*circumference;
+  svg.innerHTML = `
+    <g transform="rotate(-90 ${cx} ${cy})">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--paper-line)" stroke-width="${sw}"></circle>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--ink)" stroke-width="${sw}"
+        stroke-dasharray="${pOff} ${circumference}" stroke-linecap="butt"></circle>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--rust)" stroke-width="${sw}"
+        stroke-dasharray="${circumference-pOff} ${circumference}" stroke-dashoffset="${-pOff}" stroke-linecap="butt"></circle>
+    </g>
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="Fraunces" font-size="18" fill="var(--ink)" font-weight="600">${Math.round(principal/total*100)}%</text>
+    <text x="${cx}" y="${cy+14}" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="var(--ink-soft)">${t('legend_principal')}</text>
+    <text x="170" y="55" font-family="IBM Plex Mono" font-size="11" fill="var(--ink-soft)">${t('legend_principal')}</text>
+    <text x="170" y="72" font-family="IBM Plex Mono" font-size="14" fill="var(--ink)" font-weight="600">${s}${fmt(principal)}</text>
+    <text x="170" y="100" font-family="IBM Plex Mono" font-size="11" fill="var(--ink-soft)">${t('legend_interest')}</text>
+    <text x="170" y="117" font-family="IBM Plex Mono" font-size="14" fill="var(--rust)" font-weight="600">${s}${fmt(interest)}</text>
+  `;
+}
+
+function calcAll(){
+  calcSimple();
+  calcCompound();
+  calcLoan();
+  calcRD();
+  calcGoal();
+}
+
+['si_curr','ci_curr','ln_curr','rd_curr','gl_curr'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', calcAll);
+});
+
+applyLanguage();
+</script>
+</body>
+</html>
