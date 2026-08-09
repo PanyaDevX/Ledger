@@ -3,19 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Ledger — Interest Calculator">
-<meta property="og:description" content="Calculate Simple Interest, Compound Interest, Loan EMI, Recurring Deposits, and Savings Goals. Supports English and Thai. Everything runs locally in your browser.">
-<meta property="og:url" content="https://panyadevx.github.io/Ledger/">
-<meta property="og:image" content="https://panyadevx.github.io/Ledger/THUMBNAIL.png">
-<meta property="og:site_name" content="Ledger">
-<meta property="og:locale" content="en_US">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ledger — Interest Calculator">
-<meta name="twitter:description" content="A clean, bilingual interest calculator for simple interest, compound interest, loans, recurring deposits, and savings goals.">
-<meta name="twitter:image" content="THUMBNAIL.png">
-<meta name="theme-color" content="#16241C">
-<title>Ledger</title>
+<title>Ledger — Interest, Itemized</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Noto+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -39,6 +27,20 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{
+    scrollbar-width:thin;
+    scrollbar-color:var(--brass-dark) var(--cover);
+  }
+  ::-webkit-scrollbar{width:11px;height:11px;}
+  ::-webkit-scrollbar-track{background:var(--cover);}
+  ::-webkit-scrollbar-thumb{
+    background:var(--brass-dark);
+    border-radius:20px;
+    border:2.5px solid var(--cover);
+  }
+  ::-webkit-scrollbar-thumb:hover{background:var(--brass);}
+  ::-webkit-scrollbar-corner{background:var(--cover);}
+
   body{
     background:
       radial-gradient(1200px 600px at 15% -10%, var(--cover-2), transparent 60%),
@@ -152,6 +154,7 @@
           var(--paper) 0 40px,
           rgba(34,48,31,.035) 40px 41px
       );
+    background-position: 0 12px;
   }
   .book::before{
     content:'';
@@ -281,6 +284,96 @@
   html[lang="th"] .legend-item{font-family:'Noto Sans Thai',sans-serif;}
   .dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
 
+  /* ---------- info / "how it's calculated" ---------- */
+  .resultlabel-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;}
+  .resultlabel-row .resultlabel{margin-bottom:0;}
+  .info-btn{
+    width:27px;height:27px;flex:0 0 auto;
+    border-radius:50%;
+    border:1.5px dashed var(--brass);
+    background:var(--paper);
+    color:var(--brass-dark);
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:700;font-size:13px;line-height:1;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-8deg);
+    transition:all .2s ease;
+  }
+  .info-btn:hover{
+    background:var(--brass);border-style:solid;color:var(--paper);
+    transform:rotate(0deg) scale(1.1);
+  }
+  .info-btn:active{transform:rotate(0deg) scale(0.95);}
+
+  .modal-backdrop{
+    position:fixed;inset:0;z-index:200;
+    background:rgba(10,16,11,0.6);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;
+    opacity:0;pointer-events:none;
+    transition:opacity .22s ease;
+  }
+  .modal-backdrop.open{opacity:1;pointer-events:auto;}
+  .modal-card{
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(
+          var(--paper) 0 40px,
+          rgba(34,48,31,.035) 40px 41px
+      );
+    max-width:540px;width:100%;
+    max-height:82vh;overflow-y:auto;
+    border-radius:6px 6px 6px 6px;
+    box-shadow:var(--shadow);
+    padding:38px 36px;
+    position:relative;
+    transform:translateY(16px) scale(.97);
+    transition:transform .22s ease;
+  }
+  .modal-backdrop.open .modal-card{transform:translateY(0) scale(1);}
+  .modal-close{
+    position:absolute;top:20px;right:20px;
+    width:30px;height:30px;border-radius:50%;
+    border:1px solid var(--paper-line);background:transparent;
+    color:var(--ink-soft);cursor:pointer;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s ease;
+  }
+  .modal-close:hover{border-color:var(--brass);color:var(--ink);background:rgba(192,138,46,0.12);}
+  .modal-eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--brass-dark);margin-bottom:10px;
+  }
+  .modal-title{
+    font-family:'Fraunces',serif;font-weight:600;font-size:25px;
+    color:var(--ink);margin:0 0 18px;line-height:1.25;padding-right:24px;
+  }
+  html[lang="th"] .modal-title{font-family:'Noto Sans Thai',sans-serif;}
+  .modal-formula{
+    font-family:'IBM Plex Mono',monospace;font-size:14.5px;font-weight:600;
+    color:var(--ink);
+    background:rgba(34,48,31,0.06);
+    border-left:3px solid var(--brass);
+    padding:14px 16px;border-radius:3px;
+    margin-bottom:20px;
+    white-space:pre-wrap;line-height:1.7;
+  }
+  .modal-explain{
+    font-size:14.5px;line-height:1.75;color:var(--ink);margin:0 0 22px;
+  }
+  html[lang="th"] .modal-explain{font-family:'Noto Sans Thai',sans-serif;}
+  .modal-worked{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);
+    border-top:1px dashed var(--paper-line);padding-top:18px;
+    white-space:pre-wrap;line-height:1.9;
+  }
+  .modal-worked b{color:var(--ink);}
+  @media(max-width:680px){
+    .modal-card{padding:28px 22px;}
+    .modal-title{font-size:21px;}
+  }
+
   footer{
     max-width:1120px;margin:56px auto 0;padding:24px 24px 0;
     border-top:1px solid var(--cover-line);
@@ -365,7 +458,10 @@
     </div>
   </div>
   <div class="pane pane-right" data-panel="simple">
-    <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+    <div class="resultlabel-row">
+      <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+      <button class="info-btn" data-info="simple" type="button" aria-label="How this is calculated">?</button>
+    </div>
     <div class="bigtotal" id="si_total">0</div>
     <div class="totalcaption" id="si_caption"></div>
     <div class="stat-grid">
@@ -404,7 +500,10 @@
     </div>
   </div>
   <div class="pane pane-right" data-panel="compound" hidden>
-    <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+    <div class="resultlabel-row">
+      <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+      <button class="info-btn" data-info="compound" type="button" aria-label="How this is calculated">?</button>
+    </div>
     <div class="bigtotal" id="ci_total">0</div>
     <div class="totalcaption" id="ci_caption"></div>
     <div class="stat-grid">
@@ -437,7 +536,10 @@
     </div>
   </div>
   <div class="pane pane-right" data-panel="loan" hidden>
-    <div class="resultlabel" data-i18n="emi_label">ค่างวดรายเดือน (EMI)</div>
+    <div class="resultlabel-row">
+      <div class="resultlabel" data-i18n="emi_label">ค่างวดรายเดือน (EMI)</div>
+      <button class="info-btn" data-info="loan" type="button" aria-label="How this is calculated">?</button>
+    </div>
     <div class="bigtotal" id="ln_emi">0</div>
     <div class="totalcaption" id="ln_caption"></div>
     <div class="stat-grid">
@@ -474,7 +576,10 @@
     </div>
   </div>
   <div class="pane pane-right" data-panel="rd" hidden>
-    <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+    <div class="resultlabel-row">
+      <div class="resultlabel" data-i18n="maturity_label">มูลค่าเมื่อครบกำหนด</div>
+      <button class="info-btn" data-info="rd" type="button" aria-label="How this is calculated">?</button>
+    </div>
     <div class="bigtotal" id="rd_total">0</div>
     <div class="totalcaption" id="rd_caption"></div>
     <div class="stat-grid">
@@ -511,7 +616,10 @@
     </div>
   </div>
   <div class="pane pane-right" data-panel="goal" hidden>
-    <div class="resultlabel" data-i18n="req_monthly_label">จำนวนที่ต้องออมต่อเดือน</div>
+    <div class="resultlabel-row">
+      <div class="resultlabel" data-i18n="req_monthly_label">จำนวนที่ต้องออมต่อเดือน</div>
+      <button class="info-btn" data-info="goal" type="button" aria-label="How this is calculated">?</button>
+    </div>
     <div class="bigtotal" id="gl_monthly">0</div>
     <div class="totalcaption" id="gl_caption"></div>
     <div class="stat-grid">
@@ -529,6 +637,17 @@
   <span data-i18n="footer_left">Ledger — เครื่องคำนวณดอกเบี้ยที่เข้าใจง่าย</span>
   <span data-i18n="footer_right">ตัวเลขทั้งหมดเป็นค่าประมาณ และคำนวณในเบราว์เซอร์ของคุณ</span>
 </footer>
+
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modal-close" type="button" aria-label="Close">✕</button>
+    <div class="modal-eyebrow" id="modal-eyebrow">HOW IT'S CALCULATED</div>
+    <h3 class="modal-title" id="modal-title">—</h3>
+    <div class="modal-formula" id="modal-formula">—</div>
+    <p class="modal-explain" id="modal-explain">—</p>
+    <div class="modal-worked" id="modal-worked">—</div>
+  </div>
+</div>
 
 <script>
 const I18N = {
@@ -591,6 +710,9 @@ const I18N = {
   footer_left:{th:'Ledger — เครื่องคำนวณดอกเบี้ยที่เข้าใจง่าย', en:'Ledger — a plain-language interest calculator'},
   footer_right:{th:'ตัวเลขทั้งหมดเป็นค่าประมาณ และคำนวณในเบราว์เซอร์ของคุณ', en:'All figures are estimates and run locally in your browser.'},
 
+  modal_eyebrow:{th:'วิธีคำนวณ', en:"How it's calculated"},
+  modal_worked_title:{th:'ลองแทนค่าจากตัวเลขปัจจุบัน', en:'Worked out with your current numbers'},
+
   unit_year:{th:'ปี', en_one:'year', en_other:'years'},
   unit_month:{th:'เดือน', en_one:'month', en_other:'months'}
 };
@@ -619,6 +741,7 @@ function applyLanguage(){
   });
   refreshSliderLabels();
   calcAll();
+  if(typeof openModalSection !== 'undefined' && openModalSection) openModal(openModalSection);
 }
 
 document.querySelectorAll('.langbtn').forEach(btn=>{
@@ -696,8 +819,7 @@ link('si_p_r','si_p','si_p_val', v=>fmt(v));
 link('si_r',null,'si_r_val', v=>v.toFixed(1)+'%');
 link('si_t',null,'si_t_val', v=>v+' '+unit('unit_year',v));
 
-// https://conamsweb.hashnode.dev/using-functions-in-javascript-to-build-a-simple-interest-step-by-step-process
-function calcSimple(){ // ดอกเบี้ยแบบธรรมดา า า า าาาา เก
+function calcSimple(){
   const P = parseFloat(document.getElementById('si_p').value)||0;
   const R = parseFloat(document.getElementById('si_r').value)||0;
   const T = parseFloat(document.getElementById('si_t').value)||0;
@@ -710,7 +832,7 @@ function calcSimple(){ // ดอกเบี้ยแบบธรรมดา �
   document.getElementById('si_caption').textContent = currentLang==='th'
     ? `${s}${fmt(P)} ดอกเบี้ยแบบธรรมดา ${R}% ต่อปี เป็นเวลา ${T} ปี`
     : `${s}${fmt(P)} at ${R}% simple interest over ${T} year${T==1?'':'s'}`;
-  drawBarSplit('si_chart', P, I, s); // วาดบักเหลียมๆ 2 ก้อน (โปรดใช้งานได้สาธุ 99)
+  drawBarSplit('si_chart', P, I, s);
 }
 
 link('ci_p_r','ci_p','ci_p_val', v=>fmt(v));
@@ -733,8 +855,7 @@ function freqNameEn(n){
   return n==1?'annually':n==2?'semi-annually':n==4?'quarterly':n==12?'monthly':'daily';
 }
 
-// https://www.geeksforgeeks.org/javascript/javascript-program-to-find-compound-interest/
-function calcCompound(){ // ดอกเบี้ยทบต้น
+function calcCompound(){
   const P = parseFloat(document.getElementById('ci_p').value)||0;
   const R = parseFloat(document.getElementById('ci_r').value)||0;
   const T = parseFloat(document.getElementById('ci_t').value)||0;
@@ -763,11 +884,10 @@ link('ln_p_r','ln_p','ln_p_val', v=>fmt(v));
 link('ln_r',null,'ln_r_val', v=>v.toFixed(2)+'%');
 link('ln_t',null,'ln_t_val', v=>v+' '+unit('unit_year',v));
 
-// https://medium.com/@cwrworksite/loan-calculator-using-html-css-and-javascript-with-source-code-2ef06de5b78d
-function calcLoan(){ // เงินกู้ / ค่างวด กังๆ
-  const P = parseFloat(document.getElementById('ln_p').value)||0; // เงินต้นไพะน่ำพตีะำไพแะ
-  const R = parseFloat(document.getElementById('ln_r').value)||0; // อัตราดอกเบี้ย
-  const T = parseFloat(document.getElementById('ln_t').value)||1; // ระยะเวลา
+function calcLoan(){
+  const P = parseFloat(document.getElementById('ln_p').value)||0;
+  const R = parseFloat(document.getElementById('ln_r').value)||0;
+  const T = parseFloat(document.getElementById('ln_t').value)||1;
   const s = sym('ln_curr');
   const n = Math.round(T*12);
   const r = (R/100)/12;
@@ -809,8 +929,7 @@ link('rd_p_r','rd_p','rd_p_val', v=>fmt(v));
 link('rd_r',null,'rd_r_val', v=>v.toFixed(1)+'%');
 link('rd_t',null,'rd_t_val', v=>v+' '+unit('unit_month',v));
 
-// https://stackoverflow.com/questions/37039071/need-a-formula-to-calculate-annually-compounded-recurring-deposits
-function calcRD(){ // เงินฝากประจำ
+function calcRD(){
   const P = parseFloat(document.getElementById('rd_p').value)||0;
   const R = parseFloat(document.getElementById('rd_r').value)||0;
   const n = parseFloat(document.getElementById('rd_t').value)||1;
@@ -843,8 +962,7 @@ link('gl_r',null,'gl_r_val', v=>v.toFixed(1)+'%');
 link('gl_t',null,'gl_t_val', v=>v+' '+unit('unit_year',v));
 link('gl_s',null,'gl_s_val', v=>fmt(v));
 
-// https://www.sourcecodester.com/javascript/17189/savings-goal-calculator-using-html-css-and-javascript-source-code.html
-function calcGoal(){ // เป้าหมายเงินออม
+function calcGoal(){
   const target = parseFloat(document.getElementById('gl_p').value)||0;
   const R = parseFloat(document.getElementById('gl_r').value)||0;
   const T = parseFloat(document.getElementById('gl_t').value)||1;
@@ -945,6 +1063,157 @@ function calcAll(){
 
 ['si_curr','ci_curr','ln_curr','rd_curr','gl_curr'].forEach(id=>{
   document.getElementById(id).addEventListener('change', calcAll);
+});
+
+/* =========================================================
+   "HOW IT'S CALCULATED" MODAL
+========================================================= */
+const MODAL_CONTENT = {
+  simple:{
+    title:{th:'ดอกเบี้ยแบบธรรมดาคำนวณอย่างไร', en:'How simple interest works'},
+    formula:{th:'I = P × R × T ÷ 100\nA = P + I', en:'I = P × R × T ÷ 100\nA = P + I'},
+    explain:{
+      th:'ดอกเบี้ยแบบธรรมดาคิดจาก "เงินต้น" เพียงอย่างเดียวตลอดระยะเวลา ดอกเบี้ยที่เกิดขึ้นจะไม่ถูกนำไปคิดดอกเบี้ยต่อ — P คือเงินต้น, R คืออัตราดอกเบี้ยต่อปี (%), T คือระยะเวลาเป็นปี, I คือดอกเบี้ยที่ได้ และ A คือมูลค่ารวมเมื่อครบกำหนด',
+      en:'Simple interest is calculated only on the original principal, for the whole period — the interest earned never earns interest on itself. P is the principal, R is the annual rate (%), T is the time in years, I is the interest earned, and A is the total value at maturity.'
+    }
+  },
+  compound:{
+    title:{th:'ดอกเบี้ยทบต้นคำนวณอย่างไร', en:'How compound interest works'},
+    formula:{th:'A = P × (1 + r/n)^(n × T)\nI = A − P', en:'A = P × (1 + r/n)^(n × T)\nI = A − P'},
+    explain:{
+      th:'ทุกรอบที่ทบต้น ดอกเบี้ยจะถูกรวมเข้ากับเงินต้น แล้วรอบถัดไปจะคิดดอกเบี้ยจากยอดใหม่ที่ใหญ่ขึ้น ยิ่งทบต้นบ่อย (รายวันเทียบกับรายปี) ผลตอบแทนสุดท้ายก็จะยิ่งสูงขึ้นเล็กน้อย — r คืออัตราดอกเบี้ยต่อปี (เป็นทศนิยม) และ n คือจำนวนครั้งที่ทบต้นต่อปี',
+      en:'At each compounding period, interest is added back into the principal — so the next period earns interest on that larger amount. More frequent compounding (daily vs. yearly) yields slightly more over time. r is the annual rate as a decimal, and n is how many times per year it compounds.'
+    }
+  },
+  loan:{
+    title:{th:'ค่างวด (EMI) คำนวณอย่างไร', en:'How the loan EMI is calculated'},
+    formula:{th:'EMI = P × r × (1+r)ⁿ ÷ [(1+r)ⁿ − 1]', en:'EMI = P × r × (1+r)ⁿ ÷ [(1+r)ⁿ − 1]'},
+    explain:{
+      th:'ค่างวดรายเดือนคำนวณจากเงินต้น (P), อัตราดอกเบี้ยต่อเดือน (r = อัตราต่อปี ÷ 12), และจำนวนงวดทั้งหมด (n = จำนวนปี × 12) ค่างวดจะเท่ากันทุกเดือน แต่ในช่วงแรกส่วนใหญ่จะเป็นดอกเบี้ย แล้วค่อยๆ เปลี่ยนเป็นเงินต้นมากขึ้นเมื่อใกล้ครบสัญญา',
+      en:"The monthly payment is worked out from the principal (P), the monthly rate (r = annual rate ÷ 12), and the total number of payments (n = years × 12). The payment stays the same every month, but early payments are mostly interest, shifting toward mostly principal as the loan matures."
+    }
+  },
+  rd:{
+    title:{th:'เงินฝากประจำแบบสะสมคำนวณอย่างไร', en:'How the recurring deposit is calculated'},
+    formula:{th:'FV = D × [((1+r)ⁿ − 1) ÷ r] × (1+r)', en:'FV = D × [((1+r)ⁿ − 1) ÷ r] × (1+r)'},
+    explain:{
+      th:'ทุกเดือนเงินฝากก้อนใหม่ (D) จะเริ่มรับดอกเบี้ยทบต้นนับจากเดือนนั้นเป็นต้นไป สูตรนี้รวมมูลค่าในอนาคตของเงินฝากทุกงวดเข้าด้วยกัน ณ วันครบกำหนด (n เดือน) โดย r คืออัตราดอกเบี้ยต่อเดือน',
+      en:"Every month's new deposit (D) starts earning compound interest from that month onward. This formula sums the future value of every deposit by the time the term ends (n months), where r is the monthly rate."
+    }
+  },
+  goal:{
+    title:{th:'เป้าหมายเงินออมคำนวณอย่างไร', en:'How the savings goal is worked out'},
+    formula:{th:'เดือนละ = (เป้าหมาย − มูลค่าในอนาคตของเงินเริ่มต้น) ÷ {[(1+r)ⁿ−1]/r × (1+r)}', en:'Monthly = (Target − FV of starting balance) ÷ {[(1+r)ⁿ−1]/r × (1+r)}'},
+    explain:{
+      th:'สูตรนี้คือการย้อนกลับของสูตรเงินฝากประจำ: นำเป้าหมายตั้งต้น หักด้วยมูลค่าในอนาคตของเงินก้อนที่มีอยู่แล้ว (ถ้ามี) แล้วหารด้วยตัวคูณการทบต้น เพื่อหาว่าต้องออมเดือนละเท่าไรจึงจะถึงเป้าหมายพอดี',
+      en:"This is the recurring-deposit formula in reverse: take the target, subtract the future value of whatever you're already starting with, then divide by the compounding multiplier to find the monthly amount needed to land exactly on target."
+    }
+  }
+};
+
+function workedSimple(){
+  const P = parseFloat(document.getElementById('si_p').value)||0;
+  const R = parseFloat(document.getElementById('si_r').value)||0;
+  const T = parseFloat(document.getElementById('si_t').value)||0;
+  const I = P*R*T/100;
+  const A = P+I;
+  const s = sym('si_curr');
+  return currentLang==='th'
+    ? `P = ${s}${fmt(P)}   R = ${R}%   T = ${T} ปี\n\nI = ${fmt(P)} × ${R} × ${T} ÷ 100 = ${s}${fmt(I)}\nA = ${s}${fmt(P)} + ${s}${fmt(I)} = ${s}${fmt(A)}`
+    : `P = ${s}${fmt(P)}   R = ${R}%   T = ${T} yr\n\nI = ${fmt(P)} × ${R} × ${T} ÷ 100 = ${s}${fmt(I)}\nA = ${s}${fmt(P)} + ${s}${fmt(I)} = ${s}${fmt(A)}`;
+}
+
+function workedCompound(){
+  const P = parseFloat(document.getElementById('ci_p').value)||0;
+  const R = parseFloat(document.getElementById('ci_r').value)||0;
+  const T = parseFloat(document.getElementById('ci_t').value)||0;
+  const n = ciFreq;
+  const r = R/100;
+  const A = P*Math.pow(1+r/n, n*T);
+  const I = A-P;
+  const freqLbl = currentLang==='th' ? freqNameTh(n) : freqNameEn(n);
+  const s = sym('ci_curr');
+  return currentLang==='th'
+    ? `P = ${s}${fmt(P)}   R = ${R}%   T = ${T} ปี   ทบต้น: ${freqLbl} (n=${n})\n\nA = ${fmt(P)} × (1 + ${(r).toFixed(4)}/${n})^(${n}×${T}) = ${s}${fmt(A)}\nI = ${s}${fmt(A)} − ${s}${fmt(P)} = ${s}${fmt(I)}`
+    : `P = ${s}${fmt(P)}   R = ${R}%   T = ${T} yr   compounds: ${freqLbl} (n=${n})\n\nA = ${fmt(P)} × (1 + ${(r).toFixed(4)}/${n})^(${n}×${T}) = ${s}${fmt(A)}\nI = ${s}${fmt(A)} − ${s}${fmt(P)} = ${s}${fmt(I)}`;
+}
+
+function workedLoan(){
+  const P = parseFloat(document.getElementById('ln_p').value)||0;
+  const R = parseFloat(document.getElementById('ln_r').value)||0;
+  const T = parseFloat(document.getElementById('ln_t').value)||1;
+  const s = sym('ln_curr');
+  const n = Math.round(T*12);
+  const r = (R/100)/12;
+  let emi;
+  if(r===0){ emi = P/n; } else { emi = P*r*Math.pow(1+r,n) / (Math.pow(1+r,n)-1); }
+  return currentLang==='th'
+    ? `P = ${s}${fmt(P)}   อัตราต่อเดือน r = ${(r*100).toFixed(4)}%   n = ${n} งวด\n\nEMI = ${fmt(P)} × ${r.toFixed(5)} × (1+${r.toFixed(5)})^${n} ÷ [(1+${r.toFixed(5)})^${n} − 1]\nEMI = ${s}${fmt(emi)} ต่อเดือน`
+    : `P = ${s}${fmt(P)}   monthly rate r = ${(r*100).toFixed(4)}%   n = ${n} payments\n\nEMI = ${fmt(P)} × ${r.toFixed(5)} × (1+${r.toFixed(5)})^${n} ÷ [(1+${r.toFixed(5)})^${n} − 1]\nEMI = ${s}${fmt(emi)} per month`;
+}
+
+function workedRD(){
+  const P = parseFloat(document.getElementById('rd_p').value)||0;
+  const R = parseFloat(document.getElementById('rd_r').value)||0;
+  const n = parseFloat(document.getElementById('rd_t').value)||1;
+  const s = sym('rd_curr');
+  const r = (R/100)/12;
+  let fv;
+  if(r===0){ fv = P*n; } else { fv = P * ((Math.pow(1+r,n)-1)/r) * (1+r); }
+  return currentLang==='th'
+    ? `D = ${s}${fmt(P)}/เดือน   อัตราต่อเดือน r = ${(r*100).toFixed(4)}%   n = ${n} เดือน\n\nFV = ${fmt(P)} × [((1+${r.toFixed(5)})^${n} − 1) ÷ ${r.toFixed(5)}] × (1+${r.toFixed(5)})\nFV = ${s}${fmt(fv)}`
+    : `D = ${s}${fmt(P)}/month   monthly rate r = ${(r*100).toFixed(4)}%   n = ${n} months\n\nFV = ${fmt(P)} × [((1+${r.toFixed(5)})^${n} − 1) ÷ ${r.toFixed(5)}] × (1+${r.toFixed(5)})\nFV = ${s}${fmt(fv)}`;
+}
+
+function workedGoal(){
+  const target = parseFloat(document.getElementById('gl_p').value)||0;
+  const R = parseFloat(document.getElementById('gl_r').value)||0;
+  const T = parseFloat(document.getElementById('gl_t').value)||1;
+  const start = parseFloat(document.getElementById('gl_s').value)||0;
+  const s = sym('gl_curr');
+  const n = Math.round(T*12);
+  const r = (R/100)/12;
+  const startFV = start*Math.pow(1+r, n);
+  const remaining = Math.max(0, target-startFV);
+  let monthly;
+  if(r===0){ monthly = remaining/n; } else { monthly = remaining / (((Math.pow(1+r,n)-1)/r)*(1+r)); }
+  monthly = Math.max(0, monthly);
+  return currentLang==='th'
+    ? `เป้าหมาย = ${s}${fmt(target)}   เริ่มต้น = ${s}${fmt(start)}   n = ${n} เดือน   r = ${(r*100).toFixed(4)}%\n\nมูลค่าในอนาคตของเงินเริ่มต้น = ${s}${fmt(startFV)}\nส่วนที่เหลือต้องออม = ${s}${fmt(target)} − ${s}${fmt(startFV)} = ${s}${fmt(remaining)}\nออมเดือนละ = ${s}${fmt(remaining)} ÷ ตัวคูณทบต้น = ${s}${fmt(monthly)}`
+    : `Target = ${s}${fmt(target)}   Start = ${s}${fmt(start)}   n = ${n} months   r = ${(r*100).toFixed(4)}%\n\nFV of starting balance = ${s}${fmt(startFV)}\nRemaining to save = ${s}${fmt(target)} − ${s}${fmt(startFV)} = ${s}${fmt(remaining)}\nMonthly = ${s}${fmt(remaining)} ÷ compounding multiplier = ${s}${fmt(monthly)}`;
+}
+
+const WORKED_FN = { simple:workedSimple, compound:workedCompound, loan:workedLoan, rd:workedRD, goal:workedGoal };
+
+let openModalSection = null;
+const modalBackdrop = document.getElementById('modal-backdrop');
+
+function openModal(section){
+  const c = MODAL_CONTENT[section];
+  if(!c) return;
+  openModalSection = section;
+  document.getElementById('modal-eyebrow').textContent = t('modal_eyebrow');
+  document.getElementById('modal-title').textContent = c.title[currentLang];
+  document.getElementById('modal-formula').textContent = c.formula[currentLang];
+  document.getElementById('modal-explain').textContent = c.explain[currentLang];
+  const workedLabel = t('modal_worked_title');
+  document.getElementById('modal-worked').textContent = workedLabel + '\n\n' + WORKED_FN[section]();
+  modalBackdrop.classList.add('open');
+}
+function closeModal(){
+  modalBackdrop.classList.remove('open');
+  openModalSection = null;
+}
+
+document.querySelectorAll('.info-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> openModal(btn.dataset.info));
+});
+document.getElementById('modal-close').addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', e=>{
+  if(e.target === modalBackdrop) closeModal();
+});
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && modalBackdrop.classList.contains('open')) closeModal();
 });
 
 applyLanguage();
